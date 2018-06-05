@@ -1,0 +1,155 @@
+#include "Riostream.h"
+#include <TFile.h>
+#include <TF1.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TGraphErrors.h>
+#include <TTree.h>
+#include <TROOT.h>
+#include <TLegend.h>
+#include <math.h>
+//#define theta1 21.;
+Int_t debug = 0;
+Int_t nevts = 10000;
+Double_t PI = 3.14159265359;
+Double_t deg2rad = PI/180.;
+Double_t Y = 0.;
+Double_t r = 1.;
+Double_t xp = -0.;     //X coordinate of wire1's point.
+Double_t yp = 0.;      //Y coordinate of wire1's point.
+Double_t xp1 = -37.5;  //Top left hole x (mm).
+Double_t yp1 = 75.;    //Top left hole y (mm).
+Int_t rows = 7, columns = 7;
+const Int_t nholes = rows * columns;
+Double_t px[nholes] = {};
+Double_t py[nholes] = {};
+Int_t hole_num = 0;
+Double_t horz_sep = 12.5, vert_sep = 25.;
+
+Double_t line(Double_t *X, Double_t *par)
+{
+  Y = m*X[0]+b;
+  return Y;
+}
+
+Double_t circlep(Double_t *X, Double_t *par)
+{
+  Y = pow(par[0]*par[0]-(X[0]-par[1])*(X[0]-par[1]),0.5) + par[2];
+  return Y;
+}
+
+Double_t circlen(Double_t *X, Double_t *par)
+{
+  Y = -pow(par[0]*par[0]-(X[0]-par[1])*(X[0]-par[1]),0.5) + par[2];
+  return Y;
+}
+
+void Optics_Sieve_Uncertainty_MC() 
+{
+  //Define new random number generator (could use TRandom2,3 instead).
+  TRandom *r1=new TRandom();
+  r1->SetSeed(0);            //New random seed each time.
+  
+  //Define a new stopwatch.
+  TStopwatch *st=new TStopwatch();
+  st->Start(kTRUE);
+
+  //Generate the points representing the hole centers.
+  for(Int_t i=0;i<rows;i++)
+    {
+      for(Int_t j=0;j<columns;j++)
+	{
+	  px[hole_num] = xp1+j*horz_sep;
+	  py[hole_num] = yp1-i*vert_sep;
+	  hole_num++;
+	}
+    }
+
+  //Create canvass to draw sieve on.	  
+  TCanvas* c1=new TCanvas("c1");
+  c1->SetGrid();
+
+  //Plot points
+  //TGraph *gr = new TGraph(2,px,py);
+  
+  auto gr = new TGraph(nholes,px,py);
+  auto axis = gr->GetXaxis();
+  axis->SetLimits(-40.,40.);
+  gr->GetHistogram()->SetMaximum(80.);
+  gr->GetHistogram()->SetMinimum(-80.);
+  gr->Draw("A*");
+  gr->SetMarkerStyle(8);
+  gr->SetMarkerSize(1);
+
+  
+  //Draw radii of circles around the hole centers. 
+  //Reset hole_num.
+  hole_num = 0;
+  TF1 *fc_p[nholes];
+  char *circlep_name = new char[100];
+  TF1 *fc_n[nholes];
+  char *circlen_name = new char[100];
+  for(Int_t i=0;i<rows;i++)
+    {
+      for(Int_t j=0;j<columns;j++)
+	{
+	  sprintf(circlep_name,"fc_p%d",hole_num);
+	  sprintf(circlen_name,"fc_n%d",hole_num);
+	  fc_p[hole_num] = new TF1(circlep_name, circlep, -r+xp1+j*horz_sep, r+xp1+j*horz_sep, 4);
+	  fc_n[hole_num] = new TF1(circlen_name, circlen, -r+xp1+j*horz_sep, r+xp1+j*horz_sep, 4);
+	  //cout<<"circlep_name = "<<circlep_name<<endl;
+	  //cout<<"circle "<<hole_num<<" -> ("<<xp1+j*horz_sep<<","<<yp1-i*vert_sep<<")"<<endl;
+	  
+	  fc_p[hole_num]->SetParameter(0,r);
+	  fc_p[hole_num]->SetParameter(1,xp1+j*horz_sep);
+	  fc_p[hole_num]->SetParameter(2,yp1-i*vert_sep);
+	  fc_p[hole_num]->Draw("same");
+	  fc_p[hole_num]->SetNpx(1000);
+	  fc_p[hole_num]->SetLineColor(1);
+
+	  fc_n[hole_num]->SetParameter(0,r);
+	  fc_n[hole_num]->SetParameter(1,xp1+j*horz_sep);
+	  fc_n[hole_num]->SetParameter(2,yp1-i*vert_sep);
+	  fc_n[hole_num]->Draw("same");
+	  fc_n[hole_num]->SetNpx(1000);
+	  fc_n[hole_num]->SetLineColor(1);
+	  
+	  /*
+	  fcp0->SetParameter(0,r);
+	  fcp0->SetParameter(0,xp1+j*horz_sep);
+	  fcp0->SetParameter(0,yp1-i*vert_sep);
+	  fcp0->Draw("same");
+	  fcp0->SetNpx(1000);
+	  fcp0->SetLineColor(1);
+	  */
+	  hole_num++;
+	}
+    }
+  
+  if(debug==1)
+    {
+      for(Int_t i=0;i<nholes;i++)
+	{
+	  cout<<"px["<<i<<"] = "<<px[i]<<"   py["<<i<<"] = "<<py[i]<<endl;
+	}
+    }
+  /*
+  TF1 *fcp = new TF1("fcp", circlep, -r+xp, r+xp, 4);
+  fcp->SetParameter(0,r);
+  fcp->SetParameter(1,xp);
+  fcp->SetParameter(2,yp);
+  fcp->Draw("same");
+  fcp->SetNpx(10000);
+  fcp->SetLineColor(1);
+  */
+  TF1 *fcn = new TF1("fcn", circlen, -r+xp1, r+xp1, 4);
+  fcn->SetParameter(0,r);
+  fcn->SetParameter(1,xp1);
+  fcn->SetParameter(2,yp1);
+  fcn->Draw("same");
+  fcn->SetNpx(10000);
+  fcn->SetLineColor(1);
+  
+  st->Stop();
+  cout<<"   CPU time = "<<st->CpuTime()<<"   Real time = "<<st->RealTime()<<endl;
+}
