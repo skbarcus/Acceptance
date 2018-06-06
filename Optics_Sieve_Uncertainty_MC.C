@@ -10,7 +10,7 @@
 #include <math.h>
 //#define theta1 21.;
 Int_t debug = 0;
-const Int_t nloop = 1;
+const Int_t nloop = 100;
 Double_t PI = 3.14159265359;
 Double_t deg2rad = PI/180.;
 Double_t Y = 0.;
@@ -25,7 +25,7 @@ Double_t px[nholes] = {};            //X coordinate of hole centers.
 Double_t py[nholes] = {};            //Y coordinate of hole centers.
 Double_t qx[nholes] = {};            //X coordinate of random point in hole.
 Double_t qy[nholes] = {};            //Y coordinate of random point in hole.
-const Int_t nout = 2 * nrows + 2 * ncols -4;
+const Int_t nout = 2 * nrows + 2 * ncols - 4;
 Double_t outx[nout] = {};            //X coordinate of outer hole point for TGeoPolygon.
 Double_t outy[nout] = {};            //Y coordinate of outer hole point for TGeoPolygon.
 Double_t linex[nout+1] = {};            //X coordinate of outer hole point for TPolyLine visual.
@@ -83,14 +83,15 @@ void Optics_Sieve_Uncertainty_MC()
   auto gr = new TGraph(nholes,px,py);
   auto axis = gr->GetXaxis();
   axis->SetLimits(-40.,40.);
-  gr->SetTitle("Sieve (mm)");
+  gr->SetTitle("Sieve Plate");
+  gr->GetXaxis()->SetTitle("Horizontal Distance from Sieve Center (mm)");
+  gr->GetYaxis()->SetTitle("Vertical Distance from Sieve Center (mm)");
   gr->GetHistogram()->SetMaximum(80.);
   gr->GetHistogram()->SetMinimum(-80.);
   gr->Draw("Ap");
   gr->SetMarkerStyle(20);
   gr->SetMarkerSize(0.1);
 
-  
   //Draw radii of circles around the hole centers. 
   //Reset hole_num.
   hole_num = 0;
@@ -123,14 +124,6 @@ void Optics_Sieve_Uncertainty_MC()
 	  fc_n[hole_num]->SetNpx(1000);
 	  fc_n[hole_num]->SetLineColor(1);
 	  
-	  /*
-	  fcp0->SetParameter(0,r);
-	  fcp0->SetParameter(0,xp1+j*horz_sep);
-	  fcp0->SetParameter(0,yp1-i*vert_sep);
-	  fcp0->Draw("same");
-	  fcp0->SetNpx(1000);
-	  fcp0->SetLineColor(1);
-	  */
 	  hole_num++;
 	}
     }
@@ -142,9 +135,6 @@ void Optics_Sieve_Uncertainty_MC()
 	  cout<<"px["<<i<<"] = "<<px[i]<<"   py["<<i<<"] = "<<py[i]<<endl;
 	}
     }
-
-
-
 
   //Loop over multiple randomly generated areas.
   for(Int_t m=0;m<nloop;m++)
@@ -165,12 +155,14 @@ void Optics_Sieve_Uncertainty_MC()
 	}
       
       //Plot the random points in the sieve holes.
-      auto gr1 = new TGraph(nholes,qx,qy);
-      gr1->Draw("same p");
-      gr1->SetMarkerColor(2);
-      gr1->SetMarkerStyle(20);
-      gr1->SetMarkerSize(0.4);
-      
+      if(m<5)  //Only plot the first few random point to save time.
+	{
+	  auto gr1 = new TGraph(nholes,qx,qy);
+	  gr1->Draw("same p");
+	  gr1->SetMarkerColor(2);
+	  gr1->SetMarkerStyle(20);
+	  gr1->SetMarkerSize(0.4);
+	}
       //Fill array with the coordinates of the outer edge holes. This array needs to be filled clockwise for the TGeoPolygon to be formed correctly. Start filling from the upper right outer hole.
       
       //Fill top row of sieve's outer holes starting from the top right going towards the top left. 
@@ -180,24 +172,23 @@ void Optics_Sieve_Uncertainty_MC()
 	  outy[i] = qy[ncols-1-i];
 	}
       //Fill left column from top to bottom.
-      for(Int_t i=0;i<(nrows-1);i++)
+      for(Int_t i=0;i<(nrows-2);i++)
 	{
-	  outx[i+nrows] = qx[(i+1)*nrows];
-	  outy[i+nrows] = qy[(i+1)*nrows];
+	  outx[i+ncols] = qx[(i+1)*ncols];
+	  outy[i+ncols] = qy[(i+1)*ncols];
 	}
       //Fill bottom row from left to right. 
-      for(Int_t i=0;i<(ncols-1);i++)
+      for(Int_t i=0;i<(ncols);i++)
 	{
-	  outx[i+nrows+ncols-1] = qx[i+(nrows-1)*ncols+1];
-	  outy[i+nrows+ncols-1] = qy[i+(nrows-1)*ncols+1];
+	  outx[i+ncols+nrows-2] = qx[ncols*(nrows-1)+i];
+	  outy[i+ncols+nrows-2] = qy[ncols*(nrows-1)+i];
 	}
       //Fill right column from bottom to top.
       for(Int_t i=0;i<(nrows-2);i++)
 	{
-	  outx[i+nrows+ncols-1+nrows-1] = qx[(nrows-1)*ncols-1-(i*nrows)];
-	  outy[i+nrows+ncols-1+nrows-1] = qy[(nrows-1)*ncols-1-(i*nrows)];
+	  outx[i+ncols+nrows-2+ncols] = qx[(nrows-1)*ncols-1-(i*ncols)];
+	  outy[i+ncols+nrows-2+ncols] = qy[(nrows-1)*ncols-1-(i*ncols)];
 	}
-      
       
       //Print coordinates of outer holes.
       if(debug==1)
@@ -214,32 +205,11 @@ void Optics_Sieve_Uncertainty_MC()
       //poly->Draw("same");
       //cout<<"Poly area = "<<poly->Area()<<endl;
       //Fill areas array with the area of this loop's polygon.
-      areas[m] = poly->Area();
-      
-      /*
-	Double_t testx[4] = {10,-10,-10,10};
-	Double_t testy[4] = {10,10,-10,-10};
-	TGeoPolygon *poly = new TGeoPolygon(4);
-	poly->SetXY(testx,testy);
-	poly->FinishPolygon();
-	//poly->SetLineColor(2);
-	//poly->SetMarkerColor(2);
-	c1->Update();
-	//poly->Paint("same");
-	poly->Draw("same");
-	poly->SetDrawOption("same");
-	c1->Update();
-	//poly->Draw("ACp*");
-	//poly->Draw("same C");
-	cout<<"Poly area = "<<poly->Area()<<endl;
-	//cout<<"IsIllegalCheck() = "<<poly->IsIllegalCheck()<<endl;
-	cout<<"IsFinished() = "<<poly->IsFinished()<<endl;
-	cout<<"GetDrawOption() = "<<poly->GetDrawOption()<<endl;
-      */
+      areas[m] = poly->Area();      
       
       //Draw a TPolyLine along the outer holes connecting the points randomly selected in the holes.
       //Need to make a new array for this that adds one more entry where the last entry is the same as the first to connect the final point back to the first visually. 
-      if(m<10)   //Only draw the lines for the first few events to save time. 
+      if(m<5)   //Only draw the lines for the first few events to save time. 
 	{
 	  for(Int_t i=0;i<nout;i++)
 	    {
@@ -265,7 +235,8 @@ void Optics_Sieve_Uncertainty_MC()
     }
 
   //Make a histogram of the areas to find the uncertainty in the solid angle due to the sieve.
-  TH1* h1 = new TH1D("h1", "Outer Edge Areas for Random Points in Outer Holes", 301, 11100., 11400.);
+  TH1* h1 = new TH1D("h1", "Distribution of Areas", 301, 11100., 11400.);
+  //TH1* h1 = new TH1D("h1", "Outer Edge Areas for Random Points in Outer Holes", 301, 1700., 2100.);
   //Fill areas histo.
   for(Int_t i=0;i<nloop;i++)
     {
@@ -275,6 +246,8 @@ void Optics_Sieve_Uncertainty_MC()
   //Create canvass to draw areas histo on.	  
   TCanvas* c2=new TCanvas("c2");
   c2->SetGrid();
+  h1->GetXaxis()->SetTitle("Area Inside Connected Points Generated in Each Outer Hole Randomly (mm^{2})");
+  h1->GetYaxis()->SetTitle("Counts");
   h1->Draw();
 
   st->Stop();
