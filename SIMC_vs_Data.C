@@ -15,15 +15,15 @@ void SIMC_vs_Data()
   TStopwatch *st=new TStopwatch();
   st->Start(kTRUE);
   TChain *T = new TChain("T");
-  /*
+  
   T->Add("/home/skbarcus/Tritium/Analysis/He3/Rootfiles/e08014_3892.root");
   T->Add("/home/skbarcus/Tritium/Analysis/He3/Rootfiles/e08014_3893.root");
   T->Add("/home/skbarcus/Tritium/Analysis/He3/Rootfiles/e08014_3894.root");
   T->Add("/home/skbarcus/Tritium/Analysis/He3/Rootfiles/e08014_4073.root");
   T->Add("/home/skbarcus/Tritium/Analysis/He3/Rootfiles/e08014_4074*.root");
   T->Add("/home/skbarcus/Tritium/Analysis/He3/Rootfiles/e08014_4075*.root");
-  */
-  T->Add("/home/skbarcus/Tritium/Analysis/He3/Rootfiles/e08014_4074.root");
+  
+  //T->Add("/home/skbarcus/Tritium/Analysis/He3/Rootfiles/e08014_4074.root");
 
   T->SetBranchStatus("*",0);
   T->SetBranchStatus("EKL.x_bj",1);
@@ -83,7 +83,7 @@ void SIMC_vs_Data()
   Double_t dpmin = -0.06, dpmax = 0.06;
   Double_t gcmin = 0.;
 
-  TCut ct_norm = "Weight*Normfac/20000.";
+  TCut ct_norm = "Weight*Normfac/5500.";
   TCut ct_1tr = "L.tr.n==1";
   TCut ct_trg = "(DBB.evtypebits&1<<3)==1<<3";
   TCut ct_vz = Form("L.tr.vz>%f&&L.tr.vz<%f",vzmin,vzmax);
@@ -130,8 +130,18 @@ void SIMC_vs_Data()
   T->Draw(Form("L.tr.tg_dp>>h5(%d,-0.1,0.1)",nbins),ct_1tr&&ct_trg&&ct_th&&ct_ph&&ct_y&&ct_pr&&ct_gc&&ct_dp);
   SNT->Draw(Form("e_delta/100.>>h6(%d,-0.1,0.1)",nbins),ct_norm*(ct_y_mc&&ct_th_mc&&ct_ph_mc&&ct_dp_mc),"same");
   h6->SetLineColor(2);
-  h5->SetTitle("dp Data vs. e_delta/100 SIMC");
+  h5->SetTitle("dp Exp. Data vs. e_delta/100 SIMC");
   h5->GetXaxis()->SetTitle("dp=(P-P0)/P0");
+  h5->GetYaxis()->SetTitle("Counts");
+  gStyle->SetTitleFontSize(0.08);
+  h5->GetYaxis()->CenterTitle(true);
+  h5->GetYaxis()->SetLabelSize(0.04);
+  h5->GetYaxis()->SetTitleSize(0.06);
+  h5->GetYaxis()->SetTitleOffset(0.85);
+  h5->GetXaxis()->CenterTitle(true);
+  h5->GetXaxis()->SetLabelSize(0.04);
+  h5->GetXaxis()->SetTitleSize(0.06);
+  h5->GetXaxis()->SetTitleOffset(0.77);
 
   TCanvas* c4=new TCanvas("c4");
   c4->SetGrid();
@@ -140,8 +150,18 @@ void SIMC_vs_Data()
   T->Draw(Form("TMath::ATan(L.tr.tg_th)>>h7(%d,-0.1,0.1)",nbins),ct_1tr&&ct_trg&&ct_th&&ct_ph&&ct_y&&ct_pr&&ct_gc&&ct_dp);
   SNT->Draw(Form("e_xptar>>h8(%d,-0.1,0.1)",nbins),ct_norm*(ct_y_mc&&ct_th_mc&&ct_ph_mc&&ct_dp_mc),"same");
   h8->SetLineColor(2);
-  h7->SetTitle("xptar Data (ATan(target theta)) vs. xptar SIMC");
-  h7->GetXaxis()->SetTitle("Theta (radians)");
+  h7->SetTitle("xptar Exp. Data (ATan(#theta)) vs. xptar SIMC");
+  h7->GetXaxis()->SetTitle("#theta (radians)");
+  h7->GetYaxis()->SetTitle("Counts");
+  gStyle->SetTitleFontSize(0.08);
+  h7->GetYaxis()->CenterTitle(true);
+  h7->GetYaxis()->SetLabelSize(0.04);
+  h7->GetYaxis()->SetTitleSize(0.06);
+  h7->GetYaxis()->SetTitleOffset(0.85);
+  h7->GetXaxis()->CenterTitle(true);
+  h7->GetXaxis()->SetLabelSize(0.04);
+  h7->GetXaxis()->SetTitleSize(0.06);
+  h7->GetXaxis()->SetTitleOffset(0.77);
 
   TCanvas* c5=new TCanvas("c5");
   c5->SetGrid();
@@ -150,8 +170,19 @@ void SIMC_vs_Data()
   T->Draw(Form("TMath::ATan(L.tr.tg_ph)>>h9(%d,-0.1,0.1)",nbins),ct_1tr&&ct_trg&&ct_th&&ct_ph&&ct_y&&ct_pr&&ct_gc&&ct_dp);
   SNT->Draw(Form("e_yptar>>h10(%d,-0.1,0.1)",nbins),ct_norm*(ct_y_mc&&ct_th_mc&&ct_ph_mc&&ct_dp_mc),"same");
   h10->SetLineColor(2);
-  h9->SetTitle("yptar Data (ATan(target phi)) vs. yptar SIMC");
-  h9->GetXaxis()->SetTitle("yp target (radians)");
+  h9->SetTitle("yptar Exp. Data (ATan(#phi)) vs. yptar SIMC");
+  //h9->SetTitle("yptar Data (ATan(target phi)) vs. yptar SIMC");
+  h9->GetXaxis()->SetTitle("#phi (radians)");
+  h9->GetYaxis()->SetTitle("Counts");
+  gStyle->SetTitleFontSize(0.08);
+  h9->GetYaxis()->CenterTitle(true);
+  h9->GetYaxis()->SetLabelSize(0.04);
+  h9->GetYaxis()->SetTitleSize(0.06);
+  h9->GetYaxis()->SetTitleOffset(0.85);
+  h9->GetXaxis()->CenterTitle(true);
+  h9->GetXaxis()->SetLabelSize(0.04);
+  h9->GetXaxis()->SetTitleSize(0.06);
+  h9->GetXaxis()->SetTitleOffset(0.77);
 
   //T->Draw("EKL.x_bj>>h2(1000,0.5,3.5)","L.cer.asum_c>60 && (L.prl1.e+L.prl2.e)/L.tr.p/1000>0.7 && L.tr.tg_y>-0.028 && L.tr.tg_y<0.028 && L.tr.n==1 && (DBB.evtypebits>>3)&1");
 
