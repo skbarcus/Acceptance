@@ -100,7 +100,6 @@ void SIMC_vs_Data()
   TCut ct_pr = "L.prl1.e>(-L.prl2.e+2000)";
   TCut ct_gc = Form("L.cer.asum_c>%f",gcmin);
 
- 
   TCanvas* c1=new TCanvas("c1");
   c1->SetGrid();
   //c1->SetLogy();
@@ -130,8 +129,8 @@ void SIMC_vs_Data()
   T->Draw(Form("L.tr.tg_dp>>h5(%d,-0.1,0.1)",nbins),ct_1tr&&ct_trg&&ct_th&&ct_ph&&ct_y&&ct_pr&&ct_gc&&ct_dp);
   SNT->Draw(Form("e_delta/100.>>h6(%d,-0.1,0.1)",nbins),ct_norm*(ct_y_mc&&ct_th_mc&&ct_ph_mc&&ct_dp_mc),"same");
   h6->SetLineColor(2);
-  h5->SetTitle("dp Exp. Data vs. e_delta/100 SIMC");
-  h5->GetXaxis()->SetTitle("dp=(P-P0)/P0");
+  h5->SetTitle("dP Exp. Data vs. e_delta/100 SIMC");
+  h5->GetXaxis()->SetTitle("dP=(P-P_{0})/P_{0}");
   h5->GetYaxis()->SetTitle("Counts");
   gStyle->SetTitleFontSize(0.08);
   h5->GetYaxis()->CenterTitle(true);
@@ -140,7 +139,7 @@ void SIMC_vs_Data()
   h5->GetYaxis()->SetTitleOffset(0.85);
   h5->GetXaxis()->CenterTitle(true);
   h5->GetXaxis()->SetLabelSize(0.04);
-  h5->GetXaxis()->SetTitleSize(0.06);
+  h5->GetXaxis()->SetTitleSize(0.05);
   h5->GetXaxis()->SetTitleOffset(0.77);
 
   TCanvas* c4=new TCanvas("c4");

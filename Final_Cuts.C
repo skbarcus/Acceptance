@@ -121,7 +121,7 @@ void Final_Cuts()
   //Draw delta p target.
   T->Draw(Form("L.tr.tg_dp>>h5(%d,-0.1,0.1)",nbins),ct_1tr&&ct_trg&&ct_th&&ct_ph&&ct_y&&ct_pr&&ct_gc&&ct_dp);
   h5->SetTitle("dP Acceptance");
-  h5->GetXaxis()->SetTitle("dp=(P-P0)/P0");
+  h5->GetXaxis()->SetTitle("dP=(P-P0)/P0");
   h5->GetYaxis()->SetTitle("Counts");
   h5->GetYaxis()->CenterTitle(true);
   h5->GetYaxis()->SetLabelSize(0.04);
@@ -203,9 +203,9 @@ void Final_Cuts()
   //Draw y target data.
   //T->Draw(Form("L.tr.vz>>h1(%d,-0.12,0.12)",nbins),ct_1tr&&ct_trg&&ct_th&&ct_ph&&ct_pr&&ct_gc&&ct_dp);
   T->Draw(Form("L.tr.tg_y>>h1(%d,-0.04,0.04)",nbins),ct_1tr&&ct_trg&&ct_th&&ct_ph&&ct_pr&&ct_gc&&ct_dp);
-  h1->SetTitle("Y Target Acceptance");
+  h1->SetTitle("Y_{target} Acceptance");
   //h9->SetTitle("yptar Data (ATan(target phi)) vs. yptar SIMC");
-  h1->GetXaxis()->SetTitle("Y Target (m)");
+  h1->GetXaxis()->SetTitle("Y_{target} (m)");
   h1->GetYaxis()->SetTitle("Counts");
   h1->GetYaxis()->CenterTitle(true);
   h1->GetYaxis()->SetLabelSize(0.04);
