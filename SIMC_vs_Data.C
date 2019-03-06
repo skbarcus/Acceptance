@@ -83,7 +83,7 @@ void SIMC_vs_Data()
   Double_t dpmin = -0.06, dpmax = 0.06;
   Double_t gcmin = 0.;
 
-  TCut ct_norm = "Weight*Normfac/5500.";
+  TCut ct_norm = "Weight*Normfac/1350.";//5500 for non dp plots.//1350 for dp thesis plot.
   TCut ct_1tr = "L.tr.n==1";
   TCut ct_trg = "(DBB.evtypebits&1<<3)==1<<3";
   TCut ct_vz = Form("L.tr.vz>%f&&L.tr.vz<%f",vzmin,vzmax);
