@@ -101,15 +101,42 @@ void Th_vs_Ph_in_Y()
   c1->cd(1);
   //Draw x target/theta target.
   T->Draw(Form("L.tr.tg_y>>h1(%d,%f,%f)",nbins,yplot_min,yplot_max));//,ct_1tr&&ct_trg&&ct_th&&ct_ph&&ct_y&&ct_pr&&ct_gc&&ct_dp);
-  h1->SetTitle("L.tr.tg_y");
-  h1->GetXaxis()->SetTitle("L.tr.tg_y");
+  //h1->SetTitle("L.tr.tg_y");
+  h1->SetTitle("Y-Target");
+  //h1->SetTitleSize(10.06);
+  h1->GetYaxis()->CenterTitle(true);
+  h1->GetYaxis()->SetNdivisions(7);
+  h1->GetYaxis()->SetLabelSize(0.12);
+  h1->GetYaxis()->SetLabelOffset(-0.02);
+  h1->GetYaxis()->SetTitleSize(0.06);
+  h1->GetYaxis()->SetTitleOffset(0.75);
+  h1->GetXaxis()->CenterTitle(true);
+  h1->GetXaxis()->SetNdivisions(5);
+  h1->GetXaxis()->SetLabelSize(0.12);
+  h1->GetXaxis()->SetLabelOffset(0.0);
+  h1->GetXaxis()->SetTitleSize(0.06);
+  h1->GetXaxis()->SetTitleOffset(0.75);
+  //h1->GetXaxis()->SetTitle("L.tr.tg_y");
 
   //Draw theta vs phi with no cuts.
   c1->cd(2);
   T->Draw(Form("L.tr.tg_th:L.tr.tg_ph>>h2(%d,%f,%f,%d,%f,%f)",nbins,thplot_min,thplot_max,nbins,phplot_min,phplot_max));
-  h2->SetTitle("L.tr.tg_y");
-  h2->GetXaxis()->SetTitle("L.tr.tg_ph");
-  h2->GetYaxis()->SetTitle("L.tr.tg_th");
+  //h2->SetTitle("L.tr.tg_y");
+  h2->SetTitle("Total Solid Angle Acceptance");
+  h2->GetYaxis()->CenterTitle(true);
+  h2->GetYaxis()->SetNdivisions(7);
+  h2->GetYaxis()->SetLabelSize(0.12);
+  h2->GetYaxis()->SetLabelOffset(-0.02);
+  h2->GetYaxis()->SetTitleSize(0.06);
+  h2->GetYaxis()->SetTitleOffset(0.75);
+  h2->GetXaxis()->CenterTitle(true);
+  h2->GetXaxis()->SetNdivisions(5);
+  h2->GetXaxis()->SetLabelSize(0.12);
+  h2->GetXaxis()->SetLabelOffset(0.0);
+  h2->GetXaxis()->SetTitleSize(0.06);
+  h2->GetXaxis()->SetTitleOffset(0.75);
+  //h2->GetXaxis()->SetTitle("L.tr.tg_ph");
+  //h2->GetYaxis()->SetTitle("L.tr.tg_th");
 
   //Plot theta vs. phi is slices of y target to see how acceptance changes in y.
   for(Int_t i=0;i<nslices;i++)
@@ -117,6 +144,7 @@ void Th_vs_Ph_in_Y()
       c1->cd(3+i);
       T->Draw(Form("L.tr.tg_th:L.tr.tg_ph>>h%d(%d,%f,%f,%d,%f,%f)",3+i,nbins,thplot_min,thplot_max,nbins,phplot_min,phplot_max),Form("L.tr.tg_y>%f&&L.tr.tg_y<%f",yplot_min+i*ystep,yplot_min+(i+1)*ystep));
     }
+  //h3->SetTitle("Total Solid Angle Acceptance");
 
   st->Stop();
   cout<<"CPU time = "<<st->CpuTime()<<" s = "<<st->CpuTime()/60.<<" min   Real time = "<<st->RealTime()<<" s = "<<st->RealTime()/60.<<" min"<<endl;
